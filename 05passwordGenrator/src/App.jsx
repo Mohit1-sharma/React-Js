@@ -1,4 +1,4 @@
-import { useState , useCallback} from 'react'
+import { useState , useCallback, useEffect , useRef} from 'react'
 
 
 function App() {
@@ -7,9 +7,12 @@ function App() {
   const [charAllowed, setCharAllowed] = useState(false)
   const [password, setPassword] = useState('')
 
+  // useRef hook
+  const passwordRef = useRef(null)
+
   const passwordGenrator = useCallback(() => {
-    const pass = ""
-    const str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
+    let pass = ""
+    let str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
     if(numberAllowed) str += "0123456789"
     if(charAllowed) str += "!@#$%^&*()_+"
 
@@ -21,6 +24,17 @@ function App() {
 
   } , [length, numberAllowed, charAllowed , setPassword]) 
 
+  const copyPasswordToClipboard = useCallback (() => {
+    passwordRef.current?.select()
+
+    window.navigator.clipboard.writeText(password)
+   
+  } , [password])
+
+  useEffect(() => {
+    passwordGenrator()
+  }, [length , numberAllowed , charAllowed , passwordGenrator])
+
   return (
     <>
      
@@ -28,8 +42,16 @@ function App() {
         <h1 className = "4-xl text-center text-white">PassWord Genrator</h1>
         <div className = "flex shadow rounded-lg overflow-hidden mb-4">
           
-          <input type = "text" className = "outline-none w-full px-3 py-1" value = {password} placeholder='password' readOnly />
-          <button className = "bg-orange-500 text-white px-3 py-2 hover:bg-orange-600" onClick = {passwordGenrator}>copy</button>
+          <input 
+          type = "text"
+           className = "outline-none w-full px-3 py-1" 
+           value = {password} 
+           placeholder='password' 
+           readOnly 
+           ref = {passwordRef}
+           />
+          <button className = "bg-orange-500 text-white px-3 py-2 hover:bg-orange-600" 
+          onClick = {copyPasswordToClipboard}>copy</button>
         </div>
         <div className='flex text-sm gap-x-2'>
           <div className='flex items-center gap-x-1'>
